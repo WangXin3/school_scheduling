@@ -1,0 +1,2 @@
+# 基于OptaPlanner实现排课的小功能
+tip: OptaPlanner需要JDK版本最小为11
