@@ -7,7 +7,8 @@ import org.ponder.domain.Timeslot;
 
 import java.time.DayOfWeek;
 import java.util.List;
-import java.util.function.Function;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 
 /**
@@ -50,16 +51,16 @@ public class TimeTableConstraintProvider implements ConstraintProvider {
                     List<DayOfWeek> week135 = List.of(DayOfWeek.of(1), DayOfWeek.of(3), DayOfWeek.of(5));
                     List<DayOfWeek> week246 = List.of(DayOfWeek.of(2), DayOfWeek.of(4), DayOfWeek.of(6));
 
-                    if (subject.equals("语文") && week135.contains(dayOfWeek) && flights == 1) {
+                    if (week135.contains(dayOfWeek) && flights == 1 && !subject.equals("语文")) {
                         return true;
                     }
-                    if (subject.equals("英语") && week246.contains(dayOfWeek) && flights == 1) {
+                    if (week246.contains(dayOfWeek) && flights == 1 && !subject.equals("英语")) {
                         return true;
                     }
 
                     return false;
                 })
-                .reward(HardSoftScore.ONE_SOFT)
+                .penalize(HardSoftScore.ONE_SOFT)
                 .asConstraint("135第一节尽可能上语文，246第一节尽可能上英语");
     }
 
@@ -86,12 +87,22 @@ public class TimeTableConstraintProvider implements ConstraintProvider {
 
     Constraint oneTwoSexMustHaveLesson(ConstraintFactory constraintFactory) {
         return constraintFactory.forEach(Lesson.class)
-                .groupBy(Lesson::getStudentGroup, lesson -> lesson.getTimeslot().getDayOfWeek(), Function.identity())
-                .filter((s, dayOfWeek, lesson) -> {
-                    Integer flights = lesson.getTimeslot().getFlights();
-                    return flights == 1 || flights == 2 || flights == 6;
+                .groupBy(Lesson::getStudentGroup, lesson -> lesson.getTimeslot().getDayOfWeek(), ConstraintCollectors.toList())
+                .penalize(HardSoftScore.ONE_HARD, (s, dayOfWeek, lessons) -> {
+                    Map<Integer, List<Lesson>> flightMap = lessons.stream()
+                            .collect(Collectors.groupingBy(lesson -> lesson.getTimeslot().getFlights()));
+                    int score = 0;
+                    if (flightMap.get(1) == null || flightMap.get(1).isEmpty()) {
+                        score++;
+                    }
+                    if (flightMap.get(2) == null || flightMap.get(2).isEmpty()) {
+                        score++;
+                    }
+                    if (flightMap.get(6) == null || flightMap.get(6).isEmpty()) {
+                        score++;
+                    }
+                    return score;
                 })
-                .reward(HardSoftScore.ONE_HARD)
                 .asConstraint("第一节、第二节和第六节必须排课");
     }
 

@@ -157,11 +157,11 @@ public class Main {
         // 本地搜索解决方案
         LocalSearchPhaseConfig localSearchPhaseConfig = new LocalSearchPhaseConfig();
         // 简化配置
-//        localSearchPhaseConfig.setLocalSearchType(LocalSearchType.HILL_CLIMBING); // 0hard/60medium/-143soft
-        localSearchPhaseConfig.setLocalSearchType(LocalSearchType.TABU_SEARCH); // 0hard/88medium/-116soft
-//        localSearchPhaseConfig.setLocalSearchType(LocalSearchType.LATE_ACCEPTANCE); // 0hard/75medium/-121soft
-//        localSearchPhaseConfig.setLocalSearchType(LocalSearchType.GREAT_DELUGE); // 0hard/61medium/-132soft
-//        localSearchPhaseConfig.setLocalSearchType(LocalSearchType.VARIABLE_NEIGHBORHOOD_DESCENT); // 0hard/60medium/-143soft
+//        localSearchPhaseConfig.setLocalSearchType(LocalSearchType.HILL_CLIMBING);
+        localSearchPhaseConfig.setLocalSearchType(LocalSearchType.TABU_SEARCH);
+//        localSearchPhaseConfig.setLocalSearchType(LocalSearchType.LATE_ACCEPTANCE);
+//        localSearchPhaseConfig.setLocalSearchType(LocalSearchType.GREAT_DELUGE);
+//        localSearchPhaseConfig.setLocalSearchType(LocalSearchType.VARIABLE_NEIGHBORHOOD_DESCENT);
 
         // 高级配置
 //        localSearchPhaseConfig.setAcceptorConfig(new LocalSearchAcceptorConfig()
@@ -176,8 +176,10 @@ public class Main {
                 .withEntityClasses(Lesson.class)
                 .withConstraintProviderClass(TimeTableConstraintProvider.class)
 //                .withTerminationConfig(new TerminationConfig().withUnimprovedSecondsSpentLimit(5L))
-                .withTerminationSpentLimit(Duration.ofSeconds(10))
-                .withTerminationSpentLimit(Duration.ofSeconds(30))
+                .withTerminationSpentLimit(Duration.ofSeconds(10)) // (0hard/-14soft)
+//                .withTerminationSpentLimit(Duration.ofSeconds(30))   // (0hard/-14soft)
+//                .withTerminationSpentLimit(Duration.ofSeconds(60))   // (0hard/-12soft)
+//                .withTerminationSpentLimit(Duration.ofSeconds(120))   // (0hard/-12soft)
                 // 多线程求解
 //                .withMoveThreadCount("4")
 //                .withMoveThreadBufferSize(10)
